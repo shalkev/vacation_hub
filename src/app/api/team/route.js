@@ -44,10 +44,10 @@ function readTeam() {
 function writeTeam(team) {
     try {
         fs.writeFileSync(TEAM_FILE, JSON.stringify(team, null, 2), 'utf-8');
-        return true;
+        return { success: true };
     } catch (error) {
         console.error('Error writing team:', error);
-        return false;
+        return { success: false, error: error.message };
     }
 }
 
@@ -67,10 +67,10 @@ function readVacations() {
 function writeVacations(vacations) {
     try {
         fs.writeFileSync(VACATIONS_FILE, JSON.stringify(vacations, null, 2), 'utf-8');
-        return true;
+        return { success: true };
     } catch (error) {
         console.error('Error writing vacations:', error);
-        return false;
+        return { success: false, error: error.message };
     }
 }
 
@@ -78,13 +78,13 @@ function writeVacations(vacations) {
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const includeColors = searchParams.get('colors') === 'true';
-    
+
     const team = readTeam();
-    
+
     if (includeColors) {
         return NextResponse.json({ team, availableColors: AVAILABLE_COLORS });
     }
-    
+
     return NextResponse.json(team);
 }
 
@@ -96,7 +96,7 @@ export async function POST(request) {
 
         if (action === 'ADD') {
             const { name, color } = body;
-            
+
             if (!name || !name.trim()) {
                 return NextResponse.json(
                     { success: false, message: 'Name ist erforderlich.' },
@@ -112,7 +112,7 @@ export async function POST(request) {
             }
 
             const team = readTeam();
-            
+
             // Check if name already exists
             if (team.some(m => m.name.toLowerCase() === name.trim().toLowerCase())) {
                 return NextResponse.json(
@@ -134,12 +134,14 @@ export async function POST(request) {
             };
 
             team.push(newMember);
-            
-            if (writeTeam(team)) {
+
+            const writeResult = writeTeam(team);
+
+            if (writeResult.success) {
                 return NextResponse.json({ success: true, message: 'Teammitglied hinzugefügt.', member: newMember });
             } else {
                 return NextResponse.json(
-                    { success: false, message: 'Fehler beim Speichern.' },
+                    { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
                     { status: 500 }
                 );
             }
@@ -176,20 +178,28 @@ export async function POST(request) {
                     ...v,
                     vertreter: v.vertreter === memberName ? '' : v.vertreter // Clear as substitute
                 }));
-            
-            writeVacations(updatedVacations);
+
+            const vacWriteResult = writeVacations(updatedVacations);
+            if (!vacWriteResult.success) {
+                return NextResponse.json(
+                    { success: false, message: `Fehler beim Bereinigen der Urlaube: ${vacWriteResult.error}` },
+                    { status: 500 }
+                );
+            }
 
             // Remove team member
             team.splice(memberIndex, 1);
 
-            if (writeTeam(team)) {
-                return NextResponse.json({ 
-                    success: true, 
-                    message: `Mitglied "${memberName}" und zugehörige Urlaubseinträge entfernt.` 
+            const teamWriteResult = writeTeam(team);
+
+            if (teamWriteResult.success) {
+                return NextResponse.json({
+                    success: true,
+                    message: `Mitglied "${memberName}" und zugehörige Urlaubseinträge entfernt.`
                 });
             } else {
                 return NextResponse.json(
-                    { success: false, message: 'Fehler beim Löschen.' },
+                    { success: false, message: `Fehler beim Löschen des Mitglieds: ${teamWriteResult.error}` },
                     { status: 500 }
                 );
             }
