@@ -1,181 +1,63 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import prisma from '@/lib/db';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'vacations.json');
-const ADMIN_PASSWORD = 'Admin'; // Default password
+const ADMIN_PASSWORD = 'Admin';
 
-// Helper to read data
-function readVacations() {
-    try {
-        if (!fs.existsSync(DATA_FILE)) {
-            fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-            fs.writeFileSync(DATA_FILE, '[]', 'utf-8');
-            return [];
-        }
-        const data = fs.readFileSync(DATA_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error('Error reading vacations:', error);
-        return [];
-    }
-}
-
-// Helper to write data
-function writeVacations(vacations) {
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(vacations, null, 2), 'utf-8');
-        return { success: true };
-    } catch (error) {
-        console.error('Error writing vacations:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-// GET: Fetch all vacations
 export async function GET() {
-    const vacations = readVacations();
-    return NextResponse.json(vacations);
+    try {
+        const vacations = await prisma.vacation.findMany({
+            orderBy: { start: 'asc' },
+        });
+        return NextResponse.json(vacations);
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return NextResponse.json({ error: 'Failed to fetch vacations' }, { status: 500 });
+    }
 }
 
-// POST: Add or Delete vacation
-export async function POST(request) {
+export async function POST(req) {
     try {
-        const body = await request.json();
+        const body = await req.json();
         const { action } = body;
 
-        if (action === 'ADD') {
+        // --- HANDLE ADD ---
+        if (action === 'ADD' || !action) {
             const { name, start, end, vertreter } = body;
+            if (!name || !start || !end) return NextResponse.json({ success: false, message: 'Fehlende Daten.' }, { status: 400 });
 
-            if (!name || !start || !end) {
-                return NextResponse.json(
-                    { success: false, message: 'Name, Start und Ende sind erforderlich.' },
-                    { status: 400 }
-                );
-            }
-
-            const vacations = readVacations();
-
-            // Overlapping bookings are now ALLOWED - no blocking check
-            // The dashboard will show overlap warnings instead
-
-            const newVacation = {
-                id: uuidv4(),
-                name,
-                start,
-                end,
-                vertreter: vertreter || '',
-                createdAt: new Date().toISOString()
-            };
-
-            vacations.push(newVacation);
-
-            const writeResult = writeVacations(vacations);
-
-            if (writeResult.success) {
-                return NextResponse.json({ success: true, message: 'Urlaub erfolgreich eingetragen.', vacation: newVacation });
-            } else {
-                return NextResponse.json(
-                    { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
-                    { status: 500 }
-                );
-            }
+            const newVacation = await prisma.vacation.create({
+                data: { name, start, end, vertreter: vertreter || '' }
+            });
+            return NextResponse.json({ success: true, vacation: newVacation });
         }
 
+        // --- HANDLE DELETE ---
         if (action === 'DELETE') {
             const { id, password } = body;
+            if (password !== ADMIN_PASSWORD) return NextResponse.json({ success: false, message: 'Falsches Passwort.' }, { status: 403 });
 
-            if (password !== ADMIN_PASSWORD) {
-                return NextResponse.json(
-                    { success: false, message: 'Falsches Admin-Passwort.' },
-                    { status: 403 }
-                );
-            }
-
-            const vacations = readVacations();
-            const index = vacations.findIndex(v => v.id === id);
-
-            if (index === -1) {
-                return NextResponse.json(
-                    { success: false, message: 'Eintrag nicht gefunden.' },
-                    { status: 404 }
-                );
-            }
-
-            vacations.splice(index, 1);
-
-            const writeResult = writeVacations(vacations);
-
-            if (writeResult.success) {
-                return NextResponse.json({ success: true, message: 'Eintrag gelöscht.' });
-            } else {
-                return NextResponse.json(
-                    { success: false, message: `Fehler beim Löschen: ${writeResult.error}` },
-                    { status: 500 }
-                );
-            }
+            await prisma.vacation.delete({ where: { id } });
+            return NextResponse.json({ success: true });
         }
 
-        return NextResponse.json(
-            { success: false, message: 'Ungültige Aktion.' },
-            { status: 400 }
-        );
+        return NextResponse.json({ success: false, message: 'Invalid action' }, { status: 400 });
 
     } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json(
-            { success: false, message: 'Server Fehler.' },
-            { status: 500 }
-        );
+        console.error('Request error:', error);
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }
 
-// PUT: Update vacation (for drag & drop)
-export async function PUT(request) {
+export async function PUT(req) {
     try {
-        const body = await request.json();
-        const { id, start, end } = body;
-
-        if (!id || !start || !end) {
-            return NextResponse.json(
-                { success: false, message: 'ID, Start und Ende sind erforderlich.' },
-                { status: 400 }
-            );
-        }
-
-        const vacations = readVacations();
-        const index = vacations.findIndex(v => v.id === id);
-
-        if (index === -1) {
-            return NextResponse.json(
-                { success: false, message: 'Eintrag nicht gefunden.' },
-                { status: 404 }
-            );
-        }
-
-        // Overlapping bookings are now ALLOWED - no blocking check
-
-        vacations[index].start = start;
-        vacations[index].end = end;
-        vacations[index].updatedAt = new Date().toISOString();
-
-        const writeResult = writeVacations(vacations);
-
-        if (writeResult.success) {
-            return NextResponse.json({ success: true, message: 'Urlaub aktualisiert.', vacation: vacations[index] });
-        } else {
-            return NextResponse.json(
-                { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
-                { status: 500 }
-            );
-        }
-
+        const { id, start, end } = await req.json();
+        const updatedVacation = await prisma.vacation.update({
+            where: { id },
+            data: { start, end }
+        });
+        return NextResponse.json({ success: true, vacation: updatedVacation });
     } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json(
-            { success: false, message: 'Server Fehler.' },
-            { status: 500 }
-        );
+        console.error('Update error:', error);
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }

@@ -12,6 +12,7 @@
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
+    "@prisma/client": "^7.3.0",
     "axios": "^1.13.4",
     "bootstrap": "^5.3.8",
     "luxon": "^3.7.2",
@@ -21,5 +22,8 @@
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.3.0"
   }
 }

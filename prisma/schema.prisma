@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AnalyticsEvent {
+  id         String   @id
+  userId     String?
+  eventType  String
+  ipAddress  String?
+  geoCountry String?
+  geoCity    String?
+  userAgent  String?
+  metadata   Json?
+  timestamp  DateTime @default(now())
+  User       User?    @relation(fields: [userId], references: [id])
+
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([userId])
+}
+
+model Order {
+  id              String      @id
+  userId          String
+  status          String      @default("PENDING")
+  totalAmount     Decimal
+  stripeSessionId String?     @unique
+  stripePaymentId String?
+  projectDetails  Json?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime
+  User            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  OrderItem       OrderItem[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model OrderItem {
+  id             String         @id
+  orderId        String
+  serviceId      String
+  priceAtTime    Decimal
+  quantity       Int            @default(1)
+  createdAt      DateTime       @default(now())
+  Order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ServiceProduct ServiceProduct @relation(fields: [serviceId], references: [id])
+
+  @@index([orderId])
+}
+
+model PasswordResetToken {
+  id      String   @id
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model ServiceProduct {
+  id          String      @id
+  title       String
+  price       Decimal
+  description String
+  category    String
+  imageUrl    String?
+  demoUrl     String?
+  isActive    Boolean     @default(true)
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime
+  OrderItem   OrderItem[]
+
+  @@index([category])
+}
+
+model User {
+  id             String           @id
+  name           String?
+  email          String           @unique
+  passwordHash   String?
+  emailVerified  DateTime?
+  image          String?
+  role           String           @default("USER")
+  profileData    Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  AnalyticsEvent AnalyticsEvent[]
+  Order          Order[]
+
+  @@index([email])
+}
+
+model VerificationToken {
+  id      String   @id
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+// --- NEW MODELS FOR VACATION HUB ---
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String
+  colorId   String?
+  createdAt DateTime @default(now())
+}
+
+model Vacation {
+  id        String   @id @default(uuid())
+  name      String
+  start     String
+  end       String
+  vertreter String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

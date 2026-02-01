@@ -1,220 +1,85 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import prisma from '@/lib/db';
 
-const TEAM_FILE = path.join(process.cwd(), 'data', 'team.json');
-const VACATIONS_FILE = path.join(process.cwd(), 'data', 'vacations.json');
-const ADMIN_PASSWORD = 'Admin';
-
-// Available colors for team members to choose
-const AVAILABLE_COLORS = [
-    { id: 'coral', name: 'Koralle', hex: '#FF6B6B' },
-    { id: 'teal', name: 'Türkis', hex: '#4ECDC4' },
-    { id: 'blue', name: 'Himmelblau', hex: '#45B7D1' },
-    { id: 'mint', name: 'Mint', hex: '#96CEB4' },
-    { id: 'yellow', name: 'Sonnengelb', hex: '#FFEAA7' },
-    { id: 'lavender', name: 'Lavendel', hex: '#DDA0DD' },
-    { id: 'sage', name: 'Salbei', hex: '#98D8C8' },
-    { id: 'gold', name: 'Gold', hex: '#F7DC6F' },
-    { id: 'violet', name: 'Violett', hex: '#BB8FCE' },
-    { id: 'skyblue', name: 'Babyblau', hex: '#85C1E9' },
-    { id: 'salmon', name: 'Lachs', hex: '#F1948A' },
-    { id: 'emerald', name: 'Smaragd', hex: '#82E0AA' },
-    { id: 'orange', name: 'Orange', hex: '#E59866' },
-    { id: 'pink', name: 'Rosa', hex: '#F5B7B1' },
-    { id: 'purple', name: 'Lila', hex: '#C39BD3' },
+const COLORS = [
+    { id: 'blue', name: 'Blau', hex: '#3b82f6' },
+    { id: 'green', name: 'Grün', hex: '#10b981' },
+    { id: 'purple', name: 'Lila', hex: '#8b5cf6' },
+    { id: 'orange', name: 'Orange', hex: '#f97316' },
+    { id: 'pink', name: 'Pink', hex: '#ec4899' },
+    { id: 'teal', name: 'Türkis', hex: '#14b8a6' },
+    { id: 'indigo', name: 'Indigo', hex: '#6366f1' },
+    { id: 'cyan', name: 'Cyan', hex: '#06b6d4' },
 ];
 
-function readTeam() {
+const ADMIN_PASSWORD = 'Admin';
+
+export async function GET() {
     try {
-        if (!fs.existsSync(TEAM_FILE)) {
-            fs.mkdirSync(path.dirname(TEAM_FILE), { recursive: true });
-            fs.writeFileSync(TEAM_FILE, '[]', 'utf-8');
-            return [];
-        }
-        const data = fs.readFileSync(TEAM_FILE, 'utf-8');
-        return JSON.parse(data);
+        const team = await prisma.teamMember.findMany();
+
+        // Determine used/available colors
+        const usedColors = team.map(m => m.colorId);
+        const availableColors = COLORS.map(c => ({
+            ...c,
+            isUsed: usedColors.includes(c.id)
+        }));
+
+        return NextResponse.json({ team, availableColors });
     } catch (error) {
-        console.error('Error reading team:', error);
-        return [];
+        console.error('Fetch error:', error);
+        return NextResponse.json({ team: [], availableColors: [] }, { status: 500 });
     }
 }
 
-function writeTeam(team) {
+export async function POST(req) {
     try {
-        fs.writeFileSync(TEAM_FILE, JSON.stringify(team, null, 2), 'utf-8');
-        return { success: true };
-    } catch (error) {
-        console.error('Error writing team:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-function readVacations() {
-    try {
-        if (!fs.existsSync(VACATIONS_FILE)) {
-            return [];
-        }
-        const data = fs.readFileSync(VACATIONS_FILE, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error('Error reading vacations:', error);
-        return [];
-    }
-}
-
-function writeVacations(vacations) {
-    try {
-        fs.writeFileSync(VACATIONS_FILE, JSON.stringify(vacations, null, 2), 'utf-8');
-        return { success: true };
-    } catch (error) {
-        console.error('Error writing vacations:', error);
-        return { success: false, error: error.message };
-    }
-}
-
-// GET: Fetch all team members and available colors
-export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const includeColors = searchParams.get('colors') === 'true';
-
-    const team = readTeam();
-
-    if (includeColors) {
-        return NextResponse.json({ team, availableColors: AVAILABLE_COLORS });
-    }
-
-    return NextResponse.json(team);
-}
-
-// POST: Add or Delete team member
-export async function POST(request) {
-    try {
-        const body = await request.json();
+        const body = await req.json();
         const { action } = body;
 
-        if (action === 'ADD') {
-            const { name, color } = body;
+        // --- HANDLE ADD ---
+        if (action === 'ADD' || !action) {
+            const { name, color } = body; // color is ID here (e.g., 'blue')
+            const selectedColor = COLORS.find(c => c.id === color);
+            if (!selectedColor) return NextResponse.json({ success: false, message: 'Ungültige Farbe.' }, { status: 400 });
 
-            if (!name || !name.trim()) {
-                return NextResponse.json(
-                    { success: false, message: 'Name ist erforderlich.' },
-                    { status: 400 }
-                );
-            }
-
-            if (!color) {
-                return NextResponse.json(
-                    { success: false, message: 'Bitte wähle eine Farbe.' },
-                    { status: 400 }
-                );
-            }
-
-            const team = readTeam();
-
-            // Check if name already exists
-            if (team.some(m => m.name.toLowerCase() === name.trim().toLowerCase())) {
-                return NextResponse.json(
-                    { success: false, message: 'Dieser Name existiert bereits.' },
-                    { status: 409 }
-                );
-            }
-
-            // Find the color hex value
-            const colorInfo = AVAILABLE_COLORS.find(c => c.id === color);
-            const colorHex = colorInfo ? colorInfo.hex : color;
-
-            const newMember = {
-                id: uuidv4(),
-                name: name.trim(),
-                color: colorHex,
-                colorId: color,
-                createdAt: new Date().toISOString()
-            };
-
-            team.push(newMember);
-
-            const writeResult = writeTeam(team);
-
-            if (writeResult.success) {
-                return NextResponse.json({ success: true, message: 'Teammitglied hinzugefügt.', member: newMember });
-            } else {
-                return NextResponse.json(
-                    { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
-                    { status: 500 }
-                );
+            try {
+                const newMember = await prisma.teamMember.create({
+                    data: {
+                        name,
+                        colorId: selectedColor.id,
+                        color: selectedColor.hex
+                    }
+                });
+                return NextResponse.json({ success: true, message: 'Mitglied hinzugefügt.', member: newMember });
+            } catch (e) {
+                if (e.code === 'P2002') return NextResponse.json({ success: false, message: 'Name existiert bereits.' }, { status: 400 });
+                throw e;
             }
         }
 
+        // --- HANDLE DELETE ---
         if (action === 'DELETE') {
             const { id, password } = body;
+            if (password !== ADMIN_PASSWORD) return NextResponse.json({ success: false, message: 'Falsches Passwort.' }, { status: 403 });
 
-            if (password !== ADMIN_PASSWORD) {
-                return NextResponse.json(
-                    { success: false, message: 'Falsches Admin-Passwort.' },
-                    { status: 403 }
-                );
-            }
+            // Find member first to handle cascade deletion by name manually (or check name)
+            // Frontend uses ID. 
+            const member = await prisma.teamMember.findUnique({ where: { id } });
+            if (!member) return NextResponse.json({ success: false, message: 'Mitglied nicht gefunden.' }, { status: 404 });
 
-            const team = readTeam();
-            const memberIndex = team.findIndex(m => m.id === id);
-
-            if (memberIndex === -1) {
-                return NextResponse.json(
-                    { success: false, message: 'Mitglied nicht gefunden.' },
-                    { status: 404 }
-                );
-            }
-
-            const memberName = team[memberIndex].name;
-
-            // CASCADE DELETE: Remove all vacations for this member
-            // and clear their name from "vertreter" field
-            const vacations = readVacations();
-            const updatedVacations = vacations
-                .filter(v => v.name !== memberName) // Remove their vacations
-                .map(v => ({
-                    ...v,
-                    vertreter: v.vertreter === memberName ? '' : v.vertreter // Clear as substitute
-                }));
-
-            const vacWriteResult = writeVacations(updatedVacations);
-            if (!vacWriteResult.success) {
-                return NextResponse.json(
-                    { success: false, message: `Fehler beim Bereinigen der Urlaube: ${vacWriteResult.error}` },
-                    { status: 500 }
-                );
-            }
-
-            // Remove team member
-            team.splice(memberIndex, 1);
-
-            const teamWriteResult = writeTeam(team);
-
-            if (teamWriteResult.success) {
-                return NextResponse.json({
-                    success: true,
-                    message: `Mitglied "${memberName}" und zugehörige Urlaubseinträge entfernt.`
-                });
-            } else {
-                return NextResponse.json(
-                    { success: false, message: `Fehler beim Löschen des Mitglieds: ${teamWriteResult.error}` },
-                    { status: 500 }
-                );
-            }
+            // Delete vacations for this member and then the member
+            await prisma.$transaction([
+                prisma.vacation.deleteMany({ where: { name: member.name } }),
+                prisma.teamMember.delete({ where: { id } })
+            ]);
+            return NextResponse.json({ success: true, message: 'Mitglied gelöscht.' });
         }
 
-        return NextResponse.json(
-            { success: false, message: 'Ungültige Aktion.' },
-            { status: 400 }
-        );
+        return NextResponse.json({ success: false, message: 'Invalid action' }, { status: 400 });
 
     } catch (error) {
-        console.error('API Error:', error);
-        return NextResponse.json(
-            { success: false, message: 'Server Fehler.' },
-            { status: 500 }
-        );
+        console.error('Request error:', error);
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }
