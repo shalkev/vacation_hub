@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 const COLORS = [
     { id: 'blue', name: 'Blau', hex: '#3b82f6' },
     { id: 'green', name: 'Grün', hex: '#10b981' },
