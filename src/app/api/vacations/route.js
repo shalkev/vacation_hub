@@ -26,10 +26,10 @@ function readVacations() {
 function writeVacations(vacations) {
     try {
         fs.writeFileSync(DATA_FILE, JSON.stringify(vacations, null, 2), 'utf-8');
-        return true;
+        return { success: true };
     } catch (error) {
         console.error('Error writing vacations:', error);
-        return false;
+        return { success: false, error: error.message };
     }
 }
 
@@ -71,11 +71,13 @@ export async function POST(request) {
 
             vacations.push(newVacation);
 
-            if (writeVacations(vacations)) {
+            const writeResult = writeVacations(vacations);
+
+            if (writeResult.success) {
                 return NextResponse.json({ success: true, message: 'Urlaub erfolgreich eingetragen.', vacation: newVacation });
             } else {
                 return NextResponse.json(
-                    { success: false, message: 'Fehler beim Speichern.' },
+                    { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
                     { status: 500 }
                 );
             }
@@ -103,11 +105,13 @@ export async function POST(request) {
 
             vacations.splice(index, 1);
 
-            if (writeVacations(vacations)) {
+            const writeResult = writeVacations(vacations);
+
+            if (writeResult.success) {
                 return NextResponse.json({ success: true, message: 'Eintrag gelöscht.' });
             } else {
                 return NextResponse.json(
-                    { success: false, message: 'Fehler beim Löschen.' },
+                    { success: false, message: `Fehler beim Löschen: ${writeResult.error}` },
                     { status: 500 }
                 );
             }
@@ -156,11 +160,13 @@ export async function PUT(request) {
         vacations[index].end = end;
         vacations[index].updatedAt = new Date().toISOString();
 
-        if (writeVacations(vacations)) {
+        const writeResult = writeVacations(vacations);
+
+        if (writeResult.success) {
             return NextResponse.json({ success: true, message: 'Urlaub aktualisiert.', vacation: vacations[index] });
         } else {
             return NextResponse.json(
-                { success: false, message: 'Fehler beim Speichern.' },
+                { success: false, message: `Fehler beim Speichern: ${writeResult.error}` },
                 { status: 500 }
             );
         }
