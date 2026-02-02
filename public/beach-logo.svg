@@ -1,39 +1,83 @@
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Color: Deep Blue/Navy as in the image -->
-  <g fill="#1E293B">
+  <defs>
+    <linearGradient id="shine-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="45%" stop-color="#1E293B" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="55%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#1E293B" />
+      <animate attributeName="x1" from="-100%" to="100%" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="x2" from="0%" to="200%" dur="3s" repeatCount="indefinite" />
+    </linearGradient>
+    
+    <style>
+      @keyframes sun-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes sway {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(3deg); }
+      }
+      @keyframes float-text {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-2px); }
+      }
+      .sun-icon {
+        transform-origin: 90px 50px;
+        animation: sun-rotate 10s linear infinite;
+      }
+      .palm-leaves {
+        transform-origin: 130px 60px;
+        animation: sway 4s ease-in-out infinite;
+      }
+      .logo-text {
+        animation: float-text 3s ease-in-out infinite;
+      }
+      .interactive-group:hover {
+        filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+      }
+    </style>
+  </defs>
+
+  <g class="interactive-group">
     <!-- Ground Line -->
-    <rect x="40" y="150" width="120" height="4" rx="2"/>
+    <rect x="40" y="150" width="120" height="4" rx="2" fill="url(#shine-gradient)"/>
     
     <!-- Sun -->
-    <circle cx="90" cy="50" r="10"/>
-    <rect x="88" y="30" width="4" height="6" rx="2"/>
-    <rect x="88" y="64" width="4" height="6" rx="2"/>
-    <rect x="70" y="48" width="6" height="4" rx="2"/>
-    <rect x="104" y="48" width="6" height="4" rx="2"/>
-    <rect x="75" y="35" width="4" height="6" rx="2" transform="rotate(-45 75 35)"/>
-    <rect x="101" y="61" width="4" height="6" rx="2" transform="rotate(-45 101 61)"/>
-    <rect x="75" y="61" width="4" height="6" rx="2" transform="rotate(45 75 61)"/>
-    <rect x="101" y="35" width="4" height="6" rx="2" transform="rotate(45 101 35)"/>
+    <g class="sun-icon">
+      <circle cx="90" cy="50" r="10" fill="url(#shine-gradient)"/>
+      <rect x="88" y="30" width="4" height="6" rx="2" fill="url(#shine-gradient)"/>
+      <rect x="88" y="64" width="4" height="6" rx="2" fill="url(#shine-gradient)"/>
+      <rect x="70" y="48" width="6" height="4" rx="2" fill="url(#shine-gradient)"/>
+      <rect x="104" y="48" width="6" height="4" rx="2" fill="url(#shine-gradient)"/>
+      <rect x="75" y="35" width="4" height="6" rx="2" transform="rotate(-45 75 35)" fill="url(#shine-gradient)"/>
+      <rect x="101" y="61" width="4" height="6" rx="2" transform="rotate(-45 101 61)" fill="url(#shine-gradient)"/>
+      <rect x="75" y="61" width="4" height="6" rx="2" transform="rotate(45 75 61)" fill="url(#shine-gradient)"/>
+      <rect x="101" y="35" width="4" height="6" rx="2" transform="rotate(45 101 35)" fill="url(#shine-gradient)"/>
+    </g>
 
     <!-- Palm Tree -->
-    <path d="M125 150C125 150 135 110 130 60" stroke="#1E293B" stroke-width="8" stroke-linecap="round"/>
+    <path d="M125 150C125 150 135 110 130 60" stroke="url(#shine-gradient)" stroke-width="8" stroke-linecap="round"/>
     <!-- Palm Leaves -->
-    <path d="M130 60C130 60 145 45 160 55C160 55 145 55 130 60Z"/>
-    <path d="M130 60C130 60 155 70 155 90C155 90 145 75 130 60Z"/>
-    <path d="M130 60C130 60 115 45 100 55C100 55 115 55 130 60Z"/>
-    <path d="M130 60C130 60 105 70 105 90C105 90 115 75 130 60Z"/>
-    <path d="M130 60C130 60 130 40 145 35C145 35 135 45 130 60Z"/>
+    <g class="palm-leaves">
+      <path d="M130 60C130 60 145 45 160 55C160 55 145 55 130 60Z" fill="url(#shine-gradient)"/>
+      <path d="M130 60C130 60 155 70 155 90C155 90 145 75 130 60Z" fill="url(#shine-gradient)"/>
+      <path d="M130 60C130 60 115 45 100 55C100 55 115 55 130 60Z" fill="url(#shine-gradient)"/>
+      <path d="M130 60C130 60 105 70 105 90C105 90 115 75 130 60Z" fill="url(#shine-gradient)"/>
+      <path d="M130 60C130 60 130 40 145 35C145 35 135 45 130 60Z" fill="url(#shine-gradient)"/>
+    </g>
 
     <!-- Umbrella -->
-    <rect x="68" y="90" width="4" height="60" rx="2" transform="rotate(10 68 90)"/>
-    <path d="M35 100C35 100 50 70 85 90L92 105C92 105 65 115 45 108L35 100Z"/>
-    <circle cx="65" cy="78" r="2"/>
+    <rect x="68" y="90" width="4" height="60" rx="2" transform="rotate(10 68 90)" fill="url(#shine-gradient)"/>
+    <path d="M35 100C35 100 50 70 85 90L92 105C92 105 65 115 45 108L35 100Z" fill="url(#shine-gradient)"/>
+    <circle cx="65" cy="78" r="2" fill="url(#shine-gradient)"/>
 
     <!-- Deck Chair -->
-    <path d="M75 135L105 135L120 110" stroke="#1E293B" stroke-width="4" stroke-linecap="round" fill="none"/>
-    <path d="M85 145L115 115" stroke="#1E293B" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M75 135L105 135L120 110" stroke="url(#shine-gradient)" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M85 145L115 115" stroke="url(#shine-gradient)" stroke-width="4" stroke-linecap="round" fill="none"/>
   </g>
   
   <!-- Text -->
-  <text x="100" y="185" fill="#1E293B" font-family="Arial, sans-serif" font-weight="bold" font-size="20" text-anchor="middle" letter-spacing="1">VACATION</text>
+  <text x="100" y="185" fill="url(#shine-gradient)" font-family="Arial, sans-serif" font-weight="bold" font-size="20" text-anchor="middle" letter-spacing="1" class="logo-text">VACATION</text>
 </svg>

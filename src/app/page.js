@@ -318,7 +318,7 @@ export default function Home() {
         <Card className="shadow-lg login-card">
           <Card.Body className="p-5">
             <div className="text-center mb-4">
-              <img src="/beach-logo.svg" alt="Logo" width="80" height="auto" className="mb-3" />
+              <img src="/beach-logo.svg" alt="Logo" width="80" height="auto" className="mb-3 app-logo" />
               <h3 className="gradient-text mb-0">FI Team Vacation Hub</h3>
               <div className="text-muted small">2026 Edition</div>
               <div className="mt-2" style={{ fontSize: '0.9rem', color: '#666' }}>
@@ -411,6 +411,15 @@ export default function Home() {
                         backdrop-filter: blur(10px);
                         background: rgba(255, 255, 255, 0.9);
                     }
+                    .app-logo {
+                        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        cursor: pointer;
+                        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+                    }
+                    .app-logo:hover {
+                        transform: scale(1.15) rotate(5deg);
+                        filter: drop-shadow(0 8px 15px rgba(102, 126, 234, 0.4)) brightness(1.1);
+                    }
                 `}</style>
       </Container>
     );
@@ -425,7 +434,7 @@ export default function Home() {
           <div className="d-flex justify-content-between align-items-center">
             <div>
               <h2 className="mb-0 d-flex align-items-center">
-                <img src="/beach-logo.svg" alt="Logo" width="40" height="auto" className="me-2" />
+                <img src="/beach-logo.svg" alt="Logo" width="40" height="auto" className="me-2 app-logo" />
                 <span className="gradient-text">FI Team Vacation Hub 2026</span>
               </h2>
             </div>
