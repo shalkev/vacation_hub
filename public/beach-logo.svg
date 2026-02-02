@@ -1,31 +1,45 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Outer Thick Black Frame -->
-  <rect x="10" y="10" width="100" height="100" rx="25" fill="black"/>
-  
-  <!-- Content Area (Smaller to create thick border effect) -->
-  <rect x="20" y="20" width="80" height="80" rx="15" fill="#F9FAFB"/>
-  
-  <!-- Sky/Sea -->
-  <path d="M20 35C20 26.7157 26.7157 20 35 20H85C93.2843 20 100 26.7157 100 35V65H20V35Z" fill="#0EA5E9"/>
-  
-  <!-- Waves -->
-  <path d="M20 60C25 58 30 62 35 60C40 58 45 62 50 60C55 58 60 62 65 60C70 58 75 62 80 60C85 58 90 62 95 60C98 59 100 60 100 60V70H20V60Z" fill="#38BDF8"/>
-  
-  <!-- Sand -->
-  <path d="M20 70H100V85C100 93.2843 93.2843 100 85 100H35C26.7157 100 20 93.2843 20 85V70Z" fill="#FFC107"/>
-  
-  <!-- Sun -->
-  <circle cx="35" cy="35" r="7" fill="#FFEB3B"/>
-  
-  <!-- Starfish -->
-  <path d="M85 85L87 88L90 88.5L88.5 90.5L89 93L85 91.5L81 93L81.5 90.5L80 88.5L83 88L85 85Z" fill="#F44336"/>
-  
-  <!-- Umbrella Pole -->
-  <rect x="58" y="55" width="3" height="35" transform="rotate(15 58 55)" fill="#475569"/>
-  
-  <!-- Umbrella Canopy -->
-  <path d="M40 55C40 55 55 35 85 55L90 65C90 65 70 70 45 65L40 55Z" fill="white"/>
-  <!-- Red Segments -->
-  <path d="M40 55C40 55 48 44 55 42L52 65C48 64 43 62 40 55Z" fill="#F44336"/>
-  <path d="M68 43C68 43 78 45 85 55L75 66C70 60 68 53 68 43Z" fill="#F44336"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Professional App Icon Base -->
+  <defs>
+    <linearGradient id="bg_grad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/> <!-- Blue -->
+      <stop offset="1" stop-color="#7C3AED"/> <!-- Purple -->
+    </linearGradient>
+    <linearGradient id="sun_grad" x1="180" y1="120" x2="332" y2="272" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE047"/> <!-- Yellow -->
+      <stop offset="1" stop-color="#F59E0B"/> <!-- Orange -->
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="15"/>
+      <feOffset dx="0" dy="10" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="128" fill="url(#bg_grad)"/>
+
+  <!-- Minimalist Vacation Icon -->
+  <g filter="url(#shadow)">
+    <!-- Stylized Sun -->
+    <circle cx="256" cy="180" r="90" fill="url(#sun_grad)"/>
+    
+    <!-- Minimalist Calendar / Window to Beach -->
+    <rect x="156" y="240" width="200" height="180" rx="20" fill="white"/>
+    
+    <!-- Island / Sand inside calendar -->
+    <path d="M156 380C156 380 200 360 256 360C312 360 356 380 356 380V400C356 411.046 347.046 420 336 420H176C164.954 420 156 411.046 156 400V380Z" fill="#FBBF24"/>
+    
+    <!-- Palm Tree (Minimalist) -->
+    <path d="M280 360L290 280" stroke="#92400E" stroke-width="8" stroke-linecap="round"/>
+    <path d="M290 280C290 280 320 270 340 290" stroke="#10B981" stroke-width="8" stroke-linecap="round"/>
+    <path d="M290 280C290 280 260 270 240 290" stroke="#10B981" stroke-width="8" stroke-linecap="round"/>
+    <path d="M290 280C290 280 300 250 320 250" stroke="#10B981" stroke-width="8" stroke-linecap="round"/>
+  </g>
 </svg>
