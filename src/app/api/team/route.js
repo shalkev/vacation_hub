@@ -14,7 +14,7 @@ const COLORS = [
     { id: 'cyan', name: 'Cyan', hex: '#06b6d4' },
 ];
 
-const ADMIN_PASSWORD = 'Admin';
+const ADMIN_PASSWORD = 'sapfi';
 
 export async function GET() {
     try {

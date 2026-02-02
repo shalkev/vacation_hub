@@ -3,7 +3,7 @@ import prisma from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const ADMIN_PASSWORD = 'Admin';
+const ADMIN_PASSWORD = 'sapfi';
 
 export async function GET() {
     try {
