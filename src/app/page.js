@@ -516,9 +516,37 @@ export default function Home() {
                     today: 'Heute',
                     month: 'Monat'
                   }}
+                  eventContent={(arg) => {
+                    if (arg.event.display === 'background') {
+                      return (
+                        <div className={`fc-bg-event-content ${arg.event.classNames.join(' ')}`} style={{
+                          fontSize: '0.65rem',
+                          padding: '2px',
+                          display: 'block',
+                          width: '100%',
+                          height: '100%',
+                          position: 'relative'
+                        }}>
+                          <span className="bg-label" style={{
+                            position: 'absolute',
+                            left: '2px',
+                            maxWidth: '95%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            zIndex: 2,
+                            ...(arg.event.id.startsWith('holiday') ? { top: '2px', fontWeight: 'bold', color: '#b91c1c' } : { bottom: '2px', fontStyle: 'italic', color: '#15803d' })
+                          }}>
+                            {arg.event.title}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null; // Let FullCalendar handle normal events
+                  }}
                   eventDidMount={(info) => {
-                    // Add tooltip for holiday events
-                    if (info.event.id.startsWith('holiday-')) {
+                    // Add tooltip for all events
+                    if (info.event.title) {
                       info.el.title = info.event.title;
                     }
                   }}
@@ -773,19 +801,32 @@ export default function Home() {
                     filter: brightness(1.1);
                 }
                 
-                .calendar-card .fc-bg-event {
-                    opacity: 0.6 !important;
+                .fc-bg-event {
+                    opacity: 0.4 !important;
                 }
                 
                 .holiday-event {
                     background: repeating-linear-gradient(
                         45deg,
-                        #fff0f0,
-                        #fff0f0 10px,
-                        #ffecec 10px,
-                        #ffecec 20px
+                        rgba(255, 107, 107, 0.1),
+                        rgba(255, 107, 107, 0.1) 10px,
+                        rgba(255, 107, 107, 0.15) 10px,
+                        rgba(255, 107, 107, 0.15) 20px
                     ) !important;
-                    opacity: 0.7 !important;
+                }
+
+                .school-holiday-event {
+                    background: repeating-linear-gradient(
+                        -45deg,
+                        rgba(52, 168, 83, 0.05),
+                        rgba(52, 168, 83, 0.05) 10px,
+                        rgba(52, 168, 83, 0.1) 10px,
+                        rgba(52, 168, 83, 0.1) 20px
+                    ) !important;
+                }
+                
+                .fc-bg-event-content {
+                    pointer-events: none !important;
                 }
 
                 .fc-daygrid-day-number {
