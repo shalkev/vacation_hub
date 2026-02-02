@@ -297,7 +297,7 @@ export default function Home() {
               <Form.Group className="mb-3">
                 <Form.Control
                   type="password"
-                  placeholder="Passwort eingeben (Admin)..."
+                  placeholder="Passwort eingeben..."
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   className="text-center login-input"
