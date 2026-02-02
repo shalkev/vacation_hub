@@ -322,7 +322,7 @@ export default function Home() {
               <h3 className="gradient-text mb-0">FI Team Vacation Hub</h3>
               <div className="text-muted small">2026 Edition</div>
               <div className="mt-2" style={{ fontSize: '0.9rem', color: '#666' }}>
-                created by Volha ❤️ <br />
+                created for Dream Team ❤️ <br />
                 <span style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>für bessere Planung</span>
               </div>
             </div>
