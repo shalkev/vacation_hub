@@ -124,46 +124,46 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                 </div>
             </div>
 
-            <Row className="row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-5 mb-5">
+            <Row className="row-cols-1 row-cols-md-3 g-5 mb-5 px-3">
                 {months.map(m => (
-                    <Col key={m}>
+                    <Col key={m} className="px-4">
                         {renderMonth(m)}
                     </Col>
                 ))}
             </Row>
 
             <div className="legend mt-5 p-4 bg-white rounded shadow-sm no-print">
-                <h6 className="mb-3 fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>Team-Legende</h6>
+                <h6 className="mb-3 fw-bold text-uppercase" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Team-Legende</h6>
                 <div className="d-flex flex-wrap gap-4">
                     {team.map(member => (
                         <div key={member.id} className="d-flex align-items-center gap-2">
-                            <div className="away-dot" style={{ backgroundColor: member.color, width: 14, height: 14 }}></div>
-                            <span className="fw-semibold" style={{ fontSize: '0.9rem' }}>{member.name}</span>
+                            <div className="away-dot" style={{ backgroundColor: member.color, width: 12, height: 12 }}></div>
+                            <span className="fw-semibold" style={{ fontSize: '0.85rem' }}>{member.name}</span>
                         </div>
                     ))}
                 </div>
                 <hr />
                 <div className="d-flex gap-4 mt-3">
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day holiday" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Feiertag</span>
+                        <div className="mini-day holiday" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Feiertag</span>
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day school-holiday" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Schulferien</span>
+                        <div className="mini-day school-holiday" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Schulferien</span>
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day weekend" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Wochenende</span>
+                        <div className="mini-day weekend" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Wochenende</span>
                     </div>
                 </div>
             </div>
 
             <style jsx>{`
                 .yearly-overview {
-                    max-width: 1300px;
+                    max-width: 1400px;
                     margin: 0 auto;
-                    padding: 20px;
+                    padding: 10px;
                 }
                 .mini-calendar-grid {
                     display: grid;
@@ -174,21 +174,18 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                     font-size: 0.85rem;
                     font-weight: 800;
                     text-align: center;
-                    padding: 10px 0;
+                    padding: 4px 0;
                     color: #111;
-                    border-bottom: 2px solid #111;
-                    margin-bottom: 8px;
-                    text-transform: uppercase;
+                    margin-bottom: 2px;
                 }
                 .mini-day {
                     background: transparent;
-                    min-height: 52px;
-                    padding: 4px;
+                    min-height: 44px;
+                    padding: 2px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     position: relative;
-                    transition: background 0.2s ease;
                 }
                 .mini-day:hover:not(.empty) {
                     background: #f8fafc;
@@ -205,20 +202,25 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                     border-bottom: 2px solid #22c55e;
                 }
                 .day-number {
-                    font-size: 0.85rem;
-                    color: #111;
+                    font-size: 0.9rem;
+                    color: #222;
                     font-weight: 700;
-                    margin-bottom: 2px;
+                    margin-bottom: 4px;
                 }
                 .away-bars {
                     display: flex;
                     flex-direction: column;
-                    gap: 0px;
+                    gap: 1px;
                     width: 100%;
+                    padding: 0 1px;
                 }
                 .away-bar {
                     width: 100%;
-                    transition: all 0.2s;
+                    border-radius: 1px;
+                }
+                .mini-month-card {
+                    border: none;
+                    background: transparent;
                 }
                 .month-title {
                     background: transparent !important;
@@ -227,7 +229,7 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                     font-weight: 800 !important;
                     border: none;
                     text-align: center;
-                    padding-bottom: 10px;
+                    padding-bottom: 8px;
                     letter-spacing: -0.5px;
                 }
                 .legend {
@@ -238,8 +240,8 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                 @media print {
                     .no-print { display: none !important; }
                     .yearly-overview { background: white; padding: 0; max-width: 100%; }
-                    .mini-month-card { break-inside: avoid; margin-bottom: 40px; }
-                    .month-title { font-size: 2.2rem !important; }
+                    .mini-month-card { break-inside: avoid; margin-bottom: 30px; }
+                    .month-title { font-size: 2rem !important; }
                 }
             `}</style>
         </div>
