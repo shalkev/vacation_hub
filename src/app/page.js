@@ -279,10 +279,42 @@ export default function Home() {
   // Get used color IDs
   const usedColorIds = team.map(m => m.colorId).filter(Boolean);
 
+  // Dynamic "Dream Team" background elements
+  const dreamTeamElements = useMemo(() => {
+    return Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      delay: Math.random() * 10,
+      duration: 15 + Math.random() * 25,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: 0.8 + Math.random() * 2,
+      opacity: 0.05 + Math.random() * 0.1
+    }));
+  }, []);
+
   // Login Screen
   if (!isLoggedIn) {
     return (
-      <Container fluid className="vh-100 d-flex align-items-center justify-content-center login-bg">
+      <Container fluid className="vh-100 d-flex align-items-center justify-content-center login-bg position-relative overflow-hidden">
+        {/* Dynamic Background Elements */}
+        <div className="dream-team-container">
+          {dreamTeamElements.map(el => (
+            <div
+              key={el.id}
+              className="dream-team-text"
+              style={{
+                left: `${el.left}%`,
+                top: `${el.top}%`,
+                animationDelay: `-${el.delay}s`,
+                animationDuration: `${el.duration}s`,
+                fontSize: `${el.size}rem`,
+                opacity: el.opacity
+              }}
+            >
+              Dream Team
+            </div>
+          ))}
+        </div>
         <Card className="shadow-lg login-card">
           <Card.Body className="p-5">
             <div className="text-center mb-4">
@@ -342,6 +374,42 @@ export default function Home() {
                         border-radius: 10px;
                         padding: 12px;
                         font-weight: 600;
+                    }
+                `}</style>
+        <style jsx>{`
+                    .dream-team-container {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        pointer-events: none;
+                        z-index: 0;
+                    }
+                    .dream-team-text {
+                        position: absolute;
+                        color: white;
+                        font-weight: 900;
+                        white-space: nowrap;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                        user-select: none;
+                        animation: floatAround linear infinite;
+                        filter: blur(1px);
+                        transition: all 0.5s ease;
+                    }
+                    @keyframes floatAround {
+                        0% { transform: translate(0, 0) rotate(0deg); }
+                        25% { transform: translate(50px, 50px) rotate(5deg); }
+                        50% { transform: translate(0, 100px) rotate(0deg); }
+                        75% { transform: translate(-50px, 50px) rotate(-5deg); }
+                        100% { transform: translate(0, 0) rotate(0deg); }
+                    }
+                    .login-card {
+                        z-index: 10;
+                        position: relative;
+                        backdrop-filter: blur(10px);
+                        background: rgba(255, 255, 255, 0.9);
                     }
                 `}</style>
       </Container>
