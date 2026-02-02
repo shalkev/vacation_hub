@@ -42,7 +42,7 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                 <Card.Header className="month-title">
                     {monthName}
                 </Card.Header>
-                <Card.Body className="p-1">
+                <Card.Body className="p-0">
                     <div className="mini-calendar-grid">
                         <div className="day-header text-danger">S</div>
                         <div className="day-header">M</div>
@@ -52,7 +52,7 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                         <div className="day-header">F</div>
                         <div className="day-header">S</div>
 
-                        {/* Leading empty cells for first week (Sunday based) */}
+                        {/* Leading empty cells */}
                         {Array.from({ length: firstDayWeekday }).map((_, i) => (
                             <div key={`empty-${i}`} className="mini-day empty"></div>
                         ))}
@@ -60,17 +60,20 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                         {days.map(day => {
                             const dateStr = day.toISODate();
                             const isHoliday = holidays.some(h => h.date === dateStr);
-                            const isWknd = isWeekend(dateStr);
+                            const isWknd = day.weekday === 6 || day.weekday === 7;
                             const schoolHoliday = schoolHolidays.find(sh => {
                                 const start = DateTime.fromISO(sh.start);
                                 const end = DateTime.fromISO(sh.end);
-                                return day >= start && day <= end.minus({ days: 1 }); // Backend end is exclusive usually
+                                return day >= start && day < end;
                             });
 
-                            // Find who is away
-                            const peopleAway = team.filter(member => {
+                            // Track system to keep lines consistent
+                            const tracks = team.map(member => {
                                 const vList = memberVacations[member.name] || [];
-                                return vList.some(v => day >= v.start && day < v.end);
+                                if (vList.some(v => day >= v.start && day < v.end)) {
+                                    return member.color;
+                                }
+                                return null;
                             });
 
                             let className = "mini-day";
@@ -82,20 +85,22 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                                 <div
                                     key={dateStr}
                                     className={className}
-                                    title={`${day.toLocaleString(DateTime.DATE_HUGE)}${isHoliday ? ': ' + holidays.find(h => h.date === dateStr).name : ''}${peopleAway.length > 0 ? '\nAbwesend: ' + peopleAway.map(p => p.name).join(', ') : ''}`}
+                                    title={`${day.toLocaleString(DateTime.DATE_HUGE)}${isHoliday ? ': ' + holidays.find(h => h.date === dateStr).name : ''}`}
                                 >
                                     <span className="day-number">{day.day}</span>
-                                    {peopleAway.length > 0 && (
-                                        <div className="away-indicators">
-                                            {peopleAway.map(p => (
-                                                <div
-                                                    key={p.name}
-                                                    className="away-dot"
-                                                    style={{ backgroundColor: p.color }}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
+                                    <div className="away-bars">
+                                        {tracks.map((color, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="away-bar"
+                                                style={{
+                                                    backgroundColor: color || 'transparent',
+                                                    height: color ? '3px' : '3px',
+                                                    visibility: color ? 'visible' : 'hidden'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
                             );
                         })}
@@ -200,50 +205,41 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                     border-bottom: 2px solid #22c55e;
                 }
                 .day-number {
-                    font-size: 1rem;
+                    font-size: 0.85rem;
                     color: #111;
                     font-weight: 700;
-                    margin-bottom: 4px;
+                    margin-bottom: 2px;
                 }
-                .away-indicators {
+                .away-bars {
                     display: flex;
-                    flex-wrap: wrap;
-                    gap: 3px;
-                    justify-content: center;
+                    flex-direction: column;
+                    gap: 0px;
                     width: 100%;
                 }
-                .away-dot {
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-                }
-                .mini-month-card {
-                    border: none;
-                    background: transparent;
+                .away-bar {
+                    width: 100%;
+                    transition: all 0.2s;
                 }
                 .month-title {
                     background: transparent !important;
                     color: #000 !important;
-                    font-size: 2rem !important;
+                    font-size: 1.8rem !important;
                     font-weight: 800 !important;
                     border: none;
                     text-align: center;
-                    padding-bottom: 15px;
+                    padding-bottom: 10px;
                     letter-spacing: -0.5px;
                 }
-                .animate-in {
-                    animation: fadeIn 0.4s ease-out;
-                }
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
+                .legend {
+                    max-width: 1300px;
+                    margin-left: auto;
+                    margin-right: auto;
                 }
                 @media print {
                     .no-print { display: none !important; }
                     .yearly-overview { background: white; padding: 0; max-width: 100%; }
                     .mini-month-card { break-inside: avoid; margin-bottom: 40px; }
-                    .month-title { font-size: 2.5rem !important; }
+                    .month-title { font-size: 2.2rem !important; }
                 }
             `}</style>
         </div>
