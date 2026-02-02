@@ -20,7 +20,8 @@ import {
 import { getHolidaysForYears, getSchoolHolidaysBW } from "@/lib/holidays";
 import Dashboard from "@/components/Dashboard";
 
-const ADMIN_PASSWORD = 'sapfi';
+const LOGIN_PASSWORD = 'Admin';
+const CORRECTION_PASSWORD = 'sapfi';
 
 export default function Home() {
   // Auth state
@@ -87,7 +88,7 @@ export default function Home() {
   // Login handler
   const handleLogin = (e) => {
     e.preventDefault();
-    if (loginPassword === ADMIN_PASSWORD) {
+    if (loginPassword === LOGIN_PASSWORD) {
       setIsLoggedIn(true);
       setLoginError('');
     } else {
@@ -238,11 +239,11 @@ export default function Home() {
 
     return holidays.map(h => ({
       id: `holiday-${h.date}`,
-      title: `🎉 ${h.name}`,
+      title: `🚩 ${h.name} (Feiertag)`,
       start: h.date,
       allDay: true,
       display: 'background',
-      backgroundColor: '#ffe0e0',
+      backgroundColor: 'rgba(255, 107, 107, 0.2)', // Semi-transparent red
       borderColor: '#ff6b6b',
       classNames: ['holiday-event']
     }));
@@ -255,12 +256,12 @@ export default function Home() {
 
     return schoolHolidays.map(s => ({
       id: `school-${s.name}-${s.start}`,
-      title: s.name,
+      title: `🎓 ${s.name}`,
       start: s.start,
       end: s.end,
       allDay: true,
       display: 'background',
-      backgroundColor: '#e6f4ea',
+      backgroundColor: 'rgba(52, 168, 83, 0.15)', // Semi-transparent green
       borderColor: '#34a853',
       classNames: ['school-holiday-event']
     }));
@@ -291,7 +292,7 @@ export default function Home() {
               <Form.Group className="mb-3">
                 <Form.Control
                   type="password"
-                  placeholder="Admin-Passwort eingeben..."
+                  placeholder="Passwort eingeben (Admin)..."
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   className="text-center login-input"
@@ -399,7 +400,7 @@ export default function Home() {
                           <Form.Control
                             type="password"
                             size="sm"
-                            placeholder="Passwort"
+                            placeholder="sapfi"
                             value={teamDeletePassword}
                             onChange={(e) => setTeamDeletePassword(e.target.value)}
                             style={{ width: 80 }}
@@ -607,10 +608,10 @@ export default function Home() {
             </div>
           )}
           <Form.Group>
-            <Form.Label>Admin-Passwort zum Löschen</Form.Label>
+            <Form.Label>Passwort für Korrektur (sapfi)</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Passwort eingeben..."
+              placeholder="sapfi eingeben..."
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
             />
