@@ -19,6 +19,7 @@ import {
 } from "@/lib/api";
 import { getHolidaysForYears, getSchoolHolidaysBW } from "@/lib/holidays";
 import Dashboard from "@/components/Dashboard";
+import YearlyOverview from "@/components/YearlyOverview";
 
 const LOGIN_PASSWORD = 'Admin';
 const CORRECTION_PASSWORD = 'sapfi';
@@ -28,6 +29,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [showYearlyOverview, setShowYearlyOverview] = useState(false);
 
   // Data state
   const [vacations, setVacations] = useState([]);
@@ -420,6 +422,19 @@ export default function Home() {
                         transform: scale(1.15) rotate(5deg);
                         filter: drop-shadow(0 8px 15px rgba(102, 126, 234, 0.4)) brightness(1.1);
                     }
+
+                    @media print {
+                        .no-print, .btn, .header-actions, .alert {
+                             display: none !important;
+                        }
+                        .app-bg {
+                            background: white !important;
+                            padding: 0 !important;
+                        }
+                        .container-fluid {
+                            padding: 0 !important;
+                        }
+                    }
                 `}</style>
       </Container>
     );
@@ -429,7 +444,7 @@ export default function Home() {
   return (
     <Container fluid className="py-3 app-bg">
       {/* Header */}
-      <Row className="mb-3">
+      <Row className="mb-3 no-print">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
             <div>
@@ -438,9 +453,18 @@ export default function Home() {
                 <span className="gradient-text">FI Team Vacation Hub 2026</span>
               </h2>
             </div>
-            <Button variant="outline-secondary" size="sm" onClick={() => setIsLoggedIn(false)}>
-              Abmelden
-            </Button>
+            <div className="d-flex gap-2">
+              <Button
+                variant={showYearlyOverview ? "primary" : "outline-primary"}
+                size="sm"
+                onClick={() => setShowYearlyOverview(!showYearlyOverview)}
+              >
+                {showYearlyOverview ? "🔙 Zurück" : "📅 Kompakte Übersicht"}
+              </Button>
+              <Button variant="outline-secondary" size="sm" onClick={() => setIsLoggedIn(false)}>
+                Abmelden
+              </Button>
+            </div>
           </div>
         </Col>
       </Row>
@@ -454,6 +478,13 @@ export default function Home() {
           <Spinner animation="border" variant="primary" />
           <p className="mt-2">Lade Daten...</p>
         </div>
+      ) : showYearlyOverview ? (
+        <YearlyOverview
+          vacations={vacations}
+          team={team}
+          year={2026}
+          onClose={() => setShowYearlyOverview(false)}
+        />
       ) : (
         <Row>
           {/* Left Column - Team Management & Calendar */}
