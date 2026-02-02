@@ -262,8 +262,8 @@ export default function Home() {
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <h1 className="mb-2">🏖️</h1>
-              <h3 className="gradient-text">Team Vacation Hub</h3>
-              <p className="text-muted">2026 Edition</p>
+              <h3 className="gradient-text">efi Team Vacation Hub</h3>
+              <p className="text-muted">2026 Edition created by Volchca</p>
             </div>
             <Form onSubmit={handleLogin}>
               <Form.Group className="mb-3">
