@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Team Urlaubsplaner",
   description: "Interaktiver Kalender für die Urlaubsplanung",
+  icons: {
+    icon: "/beach-logo.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
