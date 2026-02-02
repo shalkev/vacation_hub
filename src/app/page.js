@@ -131,6 +131,11 @@ export default function Home() {
       return;
     }
 
+    if (new Date(selectedRange.end) < new Date(selectedRange.start)) {
+      setErrorMsg('Das Enddatum darf nicht vor dem Startdatum liegen.');
+      return;
+    }
+
     const result = await addVacation({
       name: selectedMember,
       start: selectedRange.start,
@@ -561,13 +566,21 @@ export default function Home() {
             <Col>
               <Form.Group className="mb-3">
                 <Form.Label>Von</Form.Label>
-                <Form.Control type="date" value={selectedRange.start} disabled />
+                <Form.Control
+                  type="date"
+                  value={selectedRange.start}
+                  onChange={(e) => setSelectedRange(prev => ({ ...prev, start: e.target.value }))}
+                />
               </Form.Group>
             </Col>
             <Col>
               <Form.Group className="mb-3">
                 <Form.Label>Bis</Form.Label>
-                <Form.Control type="date" value={selectedRange.end} disabled />
+                <Form.Control
+                  type="date"
+                  value={selectedRange.end}
+                  onChange={(e) => setSelectedRange(prev => ({ ...prev, end: e.target.value }))}
+                />
               </Form.Group>
             </Col>
           </Row>
