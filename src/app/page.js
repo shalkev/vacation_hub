@@ -17,10 +17,10 @@ import {
   deleteTeamMember,
   getColorForMember
 } from "@/lib/api";
-import { getHolidaysForYears } from "@/lib/holidays";
+import { getHolidaysForYears, getSchoolHolidaysBW } from "@/lib/holidays";
 import Dashboard from "@/components/Dashboard";
 
-const ADMIN_PASSWORD = 'Admin';
+const ADMIN_PASSWORD = 'sapfi';
 
 export default function Home() {
   // Auth state
@@ -248,8 +248,26 @@ export default function Home() {
     }));
   }, []);
 
+  // Get school holidays
+  const schoolHolidayEvents = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const schoolHolidays = getSchoolHolidaysBW(currentYear);
+
+    return schoolHolidays.map(s => ({
+      id: `school-${s.name}-${s.start}`,
+      title: s.name,
+      start: s.start,
+      end: s.end,
+      allDay: true,
+      display: 'background',
+      backgroundColor: '#e6f4ea',
+      borderColor: '#34a853',
+      classNames: ['school-holiday-event']
+    }));
+  }, []);
+
   // Combine all events
-  const allCalendarEvents = [...calendarEvents, ...holidayEvents];
+  const allCalendarEvents = [...calendarEvents, ...holidayEvents, ...schoolHolidayEvents];
 
   // Get used color IDs
   const usedColorIds = team.map(m => m.colorId).filter(Boolean);

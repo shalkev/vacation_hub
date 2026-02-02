@@ -101,3 +101,16 @@ export function getHolidaysForYears(years) {
     });
     return allHolidays;
 }
+
+// School holidays for Baden-Württemberg 2026
+export function getSchoolHolidaysBW(year) {
+    if (year !== 2026) return []; // Data specifically for 2026
+
+    return [
+        { start: '2026-03-30', end: '2026-04-12', name: 'Osterferien ❤️' },
+        { start: '2026-05-26', end: '2026-06-06', name: 'Pfingstferien ❤️' },
+        { start: '2026-07-30', end: '2026-09-13', name: 'Sommerferien ❤️' },
+        { start: '2026-10-26', end: '2026-10-31', name: 'Herbstferien ❤️' },
+        { start: '2026-12-23', end: '2027-01-10', name: 'Weihnachtsferien ❤️' }
+    ];
+}
