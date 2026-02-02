@@ -287,8 +287,8 @@ export default function Home() {
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <img src="/beach-logo.svg" alt="Logo" width="80" height="auto" className="mb-3" />
-              <h3 className="gradient-text mb-0">Team Urlaubsplaner</h3>
-              <div className="text-muted small">Edition 2026</div>
+              <h3 className="gradient-text mb-0">FI Team Vacation Hub</h3>
+              <div className="text-muted small">2026 Edition</div>
               <div className="mt-2" style={{ fontSize: '0.9rem', color: '#666' }}>
                 created by Volha ❤️ <br />
                 <span style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>für bessere Planung</span>
@@ -358,7 +358,7 @@ export default function Home() {
             <div>
               <h2 className="mb-0 d-flex align-items-center">
                 <img src="/beach-logo.svg" alt="Logo" width="40" height="auto" className="me-2" />
-                <span className="gradient-text">Team Urlaubsplaner 2026</span>
+                <span className="gradient-text">FI Team Vacation Hub 2026</span>
               </h2>
             </div>
             <Button variant="outline-secondary" size="sm" onClick={() => setIsLoggedIn(false)}>

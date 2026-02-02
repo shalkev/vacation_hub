@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Team Urlaubsplaner",
+  title: "FI Team Vacation Hub",
   description: "Interaktiver Kalender für die Urlaubsplanung",
   icons: {
     icon: "/beach-logo.svg",
