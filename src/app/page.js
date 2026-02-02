@@ -435,6 +435,54 @@ export default function Home() {
                             padding: 0 !important;
                         }
                     }
+
+                    .compact-overview-btn {
+                        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+                        border: none !important;
+                        color: white !important;
+                        font-weight: 700 !important;
+                        padding: 8px 20px !important;
+                        border-radius: 50px !important;
+                        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                        letter-spacing: 0.5px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+
+                    .compact-overview-btn:hover {
+                        transform: translateY(-2px) scale(1.02);
+                        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+                        background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+                    }
+
+                    .compact-overview-btn:active {
+                        transform: translateY(0) scale(0.98);
+                    }
+
+                    .compact-overview-btn {
+                        animation: buttonPulse 3s infinite;
+                    }
+
+                    @keyframes buttonPulse {
+                        0% { box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+                        50% { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.6); }
+                        100% { box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+                    }
+
+                    .logout-btn {
+                        border-radius: 50px !important;
+                        padding: 8px 16px !important;
+                        font-weight: 600 !important;
+                        transition: all 0.2s ease !important;
+                    }
+
+                    .logout-btn:hover {
+                        background: #fee2e2 !important;
+                        color: #dc2626 !important;
+                        border-color: #fecaca !important;
+                    }
                 `}</style>
       </Container>
     );
@@ -455,13 +503,12 @@ export default function Home() {
             </div>
             <div className="d-flex gap-2">
               <Button
-                variant={showYearlyOverview ? "primary" : "outline-primary"}
-                size="sm"
+                className="compact-overview-btn"
                 onClick={() => setShowYearlyOverview(!showYearlyOverview)}
               >
-                {showYearlyOverview ? "🔙 Zurück" : "📅 Kompakte Übersicht"}
+                {showYearlyOverview ? "🔙 Zurück zum Kalender" : "📅 Kompakte Übersicht"}
               </Button>
-              <Button variant="outline-secondary" size="sm" onClick={() => setIsLoggedIn(false)}>
+              <Button variant="outline-secondary" className="logout-btn" size="sm" onClick={() => setIsLoggedIn(false)}>
                 Abmelden
               </Button>
             </div>
