@@ -296,7 +296,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
 
             {/* Team Vacation Counter */}
             <Card className="mb-3 shadow-sm">
-                <Card.Header className="bg-primary text-white fw-bold">
+                <Card.Header className="bg-gradient-purple text-white fw-bold">
                     📊 Urlaubstage (Arbeitstage)
                 </Card.Header>
                 <Card.Body className="p-2">
@@ -339,7 +339,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
 
             {/* Absence Chart */}
             <Card className="mb-3 shadow-sm">
-                <Card.Header className="bg-info text-white fw-bold">
+                <Card.Header className="bg-gradient-purple text-white fw-bold">
                     📈 Abwesenheit {periodLabel}
                 </Card.Header>
                 <Card.Body className="p-2">
@@ -372,7 +372,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
 
             {/* Collision Warnings */}
             <Card className="mb-3 shadow-sm">
-                <Card.Header className="bg-warning text-dark fw-bold">
+                <Card.Header className="bg-gradient-purple text-white fw-bold">
                     ⚠️ Überschneidungen
                 </Card.Header>
                 <Card.Body className="p-2">
@@ -399,7 +399,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
 
             {/* Yearly Heatmap */}
             <Card className="shadow-sm">
-                <Card.Header className="bg-dark text-white fw-bold">
+                <Card.Header className="bg-gradient-purple text-white fw-bold">
                     🗓️ Jahres-Trend
                 </Card.Header>
                 <Card.Body className="p-2">

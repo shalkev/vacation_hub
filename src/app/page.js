@@ -651,7 +651,7 @@ export default function Home() {
 
       {/* Booking Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton className="bg-primary text-white">
+        <Modal.Header closeButton className="bg-gradient-purple text-white">
           <Modal.Title>🗓️ Urlaub buchen</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -776,6 +776,10 @@ export default function Home() {
                     background: linear-gradient(-45deg, #667eea, #764ba2, #6B8DD6, #8E37D7);
                     background-size: 400% 400%;
                     animation: gradientBG 10s ease infinite;
+                }
+
+                .bg-gradient-purple {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
                 }
 
                 /* Typography */
