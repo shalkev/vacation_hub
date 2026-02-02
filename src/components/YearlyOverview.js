@@ -34,23 +34,26 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
 
         const days = Array.from({ length: daysInMonth }, (_, i) => startOfMonth.set({ day: i + 1 }));
 
+        // Sunday-based weekday (0-6)
+        const firstDayWeekday = startOfMonth.weekday === 7 ? 0 : startOfMonth.weekday;
+
         return (
-            <Card className="h-100 shadow-sm mini-month-card">
-                <Card.Header className="py-1 bg-gradient-purple text-white text-center fw-bold" style={{ fontSize: '0.9rem' }}>
+            <Card className="h-100 mini-month-card">
+                <Card.Header className="month-title">
                     {monthName}
                 </Card.Header>
                 <Card.Body className="p-1">
                     <div className="mini-calendar-grid">
+                        <div className="day-header text-danger">S</div>
                         <div className="day-header">M</div>
-                        <div className="day-header">D</div>
-                        <div className="day-header">M</div>
-                        <div className="day-header">D</div>
+                        <div className="day-header">T</div>
+                        <div className="day-header">W</div>
+                        <div className="day-header">T</div>
                         <div className="day-header">F</div>
-                        <div className="day-header text-danger">S</div>
-                        <div className="day-header text-danger">S</div>
+                        <div className="day-header">S</div>
 
-                        {/* Leading empty cells for first week */}
-                        {Array.from({ length: (startOfMonth.weekday - 1) }).map((_, i) => (
+                        {/* Leading empty cells for first week (Sunday based) */}
+                        {Array.from({ length: firstDayWeekday }).map((_, i) => (
                             <div key={`empty-${i}`} className="mini-day empty"></div>
                         ))}
 
@@ -104,30 +107,19 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
 
     return (
         <div className="yearly-overview animate-in">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-4 no-print">
                 <h3 className="mb-0 gradient-text">📅 Jahresübersicht {year}</h3>
                 <div className="d-flex gap-3 align-items-center">
-                    <div className="d-flex gap-2 flex-wrap">
-                        {team.map(member => (
-                            <Badge
-                                key={member.id}
-                                style={{
-                                    backgroundColor: member.color,
-                                    fontSize: '0.75rem',
-                                    border: '1px solid rgba(0,0,0,0.1)'
-                                }}
-                            >
-                                {member.name}
-                            </Badge>
-                        ))}
-                    </div>
                     <Button variant="outline-primary" size="sm" onClick={() => window.print()}>
-                        🖨️ Drucken
+                        🖨️ Bericht drucken
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={onClose}>
+                        Zurück
                     </Button>
                 </div>
             </div>
 
-            <Row g={3} className="row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+            <Row className="row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-5 mb-5">
                 {months.map(m => (
                     <Col key={m}>
                         {renderMonth(m)}
@@ -135,64 +127,110 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                 ))}
             </Row>
 
+            <div className="legend mt-5 p-4 bg-white rounded shadow-sm no-print">
+                <h6 className="mb-3 fw-bold text-uppercase" style={{ letterSpacing: '1px' }}>Team-Legende</h6>
+                <div className="d-flex flex-wrap gap-4">
+                    {team.map(member => (
+                        <div key={member.id} className="d-flex align-items-center gap-2">
+                            <div className="away-dot" style={{ backgroundColor: member.color, width: 14, height: 14 }}></div>
+                            <span className="fw-semibold" style={{ fontSize: '0.9rem' }}>{member.name}</span>
+                        </div>
+                    ))}
+                </div>
+                <hr />
+                <div className="d-flex gap-4 mt-3">
+                    <div className="d-flex align-items-center gap-2">
+                        <div className="mini-day holiday" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Feiertag</span>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                        <div className="mini-day school-holiday" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Schulferien</span>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                        <div className="mini-day weekend" style={{ width: 22, height: 22, minHeight: 'auto' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Wochenende</span>
+                    </div>
+                </div>
+            </div>
+
             <style jsx>{`
+                .yearly-overview {
+                    max-width: 1300px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
                 .mini-calendar-grid {
                     display: grid;
                     grid-template-columns: repeat(7, 1fr);
-                    gap: 1px;
-                    background: #eee;
-                    border: 1px solid #eee;
-                    border-radius: 4px;
-                    overflow: hidden;
+                    border: none;
                 }
                 .day-header {
-                    background: #f8f9fa;
-                    font-size: 0.65rem;
-                    font-weight: bold;
+                    font-size: 0.85rem;
+                    font-weight: 800;
                     text-align: center;
-                    padding: 2px 0;
-                    color: #666;
+                    padding: 10px 0;
+                    color: #111;
+                    border-bottom: 2px solid #111;
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
                 }
                 .mini-day {
-                    background: white;
-                    min-height: 35px;
-                    padding: 2px;
+                    background: transparent;
+                    min-height: 52px;
+                    padding: 4px;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     position: relative;
+                    transition: background 0.2s ease;
                 }
-                .mini-day.empty {
-                    background: #fdfdfd;
+                .mini-day:hover:not(.empty) {
+                    background: #f8fafc;
+                    border-radius: 4px;
                 }
-                .mini-day.weekend {
-                    background: #fff5f5;
+                .mini-day.weekend .day-number {
+                    color: #ef4444;
                 }
                 .mini-day.holiday {
-                    background: #ffe3e3;
+                    background-color: #fee2e2;
+                    border-radius: 4px;
                 }
                 .mini-day.school-holiday {
-                    background: #f2fdf5;
-                    border: 1px dashed #dcfce7;
+                    border-bottom: 2px solid #22c55e;
                 }
                 .day-number {
-                    font-size: 0.7rem;
-                    color: #444;
-                    font-weight: 500;
-                    margin-bottom: 2px;
+                    font-size: 1rem;
+                    color: #111;
+                    font-weight: 700;
+                    margin-bottom: 4px;
                 }
                 .away-indicators {
                     display: flex;
                     flex-wrap: wrap;
-                    gap: 1px;
+                    gap: 3px;
                     justify-content: center;
                     width: 100%;
                 }
                 .away-dot {
-                    width: 6px;
-                    height: 6px;
+                    width: 8px;
+                    height: 8px;
                     border-radius: 50%;
-                    box-shadow: 0 0 1px rgba(0,0,0,0.2);
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+                }
+                .mini-month-card {
+                    border: none;
+                    background: transparent;
+                }
+                .month-title {
+                    background: transparent !important;
+                    color: #000 !important;
+                    font-size: 2rem !important;
+                    font-weight: 800 !important;
+                    border: none;
+                    text-align: center;
+                    padding-bottom: 15px;
+                    letter-spacing: -0.5px;
                 }
                 .animate-in {
                     animation: fadeIn 0.4s ease-out;
@@ -203,9 +241,9 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                 }
                 @media print {
                     .no-print { display: none !important; }
-                    .yearly-overview { background: white; padding: 0; }
-                    .mini-month-card { border: 1px solid #ddd; break-inside: avoid; }
-                    .app-bg { background: transparent !important; }
+                    .yearly-overview { background: white; padding: 0; max-width: 100%; }
+                    .mini-month-card { break-inside: avoid; margin-bottom: 40px; }
+                    .month-title { font-size: 2.5rem !important; }
                 }
             `}</style>
         </div>
