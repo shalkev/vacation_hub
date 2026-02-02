@@ -38,210 +38,171 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
         const firstDayWeekday = startOfMonth.weekday === 7 ? 0 : startOfMonth.weekday;
 
         return (
-            <Card className="h-100 mini-month-card">
-                <Card.Header className="month-title">
+            <div className="mini-month-card" style={{ marginBottom: '40px' }}>
+                <h2 style={{
+                    textAlign: 'center',
+                    fontSize: '1.8rem',
+                    fontWeight: '800',
+                    marginBottom: '10px',
+                    letterSpacing: '-0.5px'
+                }}>
                     {monthName}
-                </Card.Header>
-                <Card.Body className="p-0">
-                    <div className="mini-calendar-grid">
-                        <div className="day-header text-danger">S</div>
-                        <div className="day-header">M</div>
-                        <div className="day-header">T</div>
-                        <div className="day-header">W</div>
-                        <div className="day-header">T</div>
-                        <div className="day-header">F</div>
-                        <div className="day-header">S</div>
+                </h2>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(7, 1fr)',
+                    width: '100%',
+                    borderTop: '2px solid #111'
+                }}>
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((h, i) => (
+                        <div key={i} style={{
+                            textAlign: 'center',
+                            fontWeight: '800',
+                            fontSize: '0.85rem',
+                            padding: '10px 0',
+                            color: i === 0 ? '#ef4444' : '#111',
+                            borderBottom: '2px solid #111'
+                        }}>
+                            {h}
+                        </div>
+                    ))}
 
-                        {/* Leading empty cells */}
-                        {Array.from({ length: firstDayWeekday }).map((_, i) => (
-                            <div key={`empty-${i}`} className="mini-day empty"></div>
-                        ))}
+                    {/* Leading empty cells */}
+                    {Array.from({ length: firstDayWeekday }).map((_, i) => (
+                        <div key={`empty-${i}`} style={{ minHeight: '50px' }}></div>
+                    ))}
 
-                        {days.map(day => {
-                            const dateStr = day.toISODate();
-                            const isHoliday = holidays.some(h => h.date === dateStr);
-                            const isWknd = day.weekday === 6 || day.weekday === 7;
-                            const schoolHoliday = schoolHolidays.find(sh => {
-                                const start = DateTime.fromISO(sh.start);
-                                const end = DateTime.fromISO(sh.end);
-                                return day >= start && day < end;
-                            });
+                    {days.map(day => {
+                        const dateStr = day.toISODate();
+                        const isHoliday = holidays.some(h => h.date === dateStr);
+                        const isWeekendDay = day.weekday === 6 || day.weekday === 7;
+                        const schoolHoliday = schoolHolidays.find(sh => {
+                            const start = DateTime.fromISO(sh.start);
+                            const end = DateTime.fromISO(sh.end);
+                            return day >= start && day < end;
+                        });
 
-                            // Track system to keep lines consistent
-                            const tracks = team.map(member => {
-                                const vList = memberVacations[member.name] || [];
-                                if (vList.some(v => day >= v.start && day < v.end)) {
-                                    return member.color;
-                                }
-                                return null;
-                            });
+                        // Each member gets a dedicated track for vacation strips
+                        const tracks = team.map(member => {
+                            const vList = memberVacations[member.name] || [];
+                            const isAway = vList.some(v => day >= v.start && day < v.end);
+                            return isAway ? member.color : null;
+                        });
 
-                            let className = "mini-day";
-                            if (isWknd) className += " weekend";
-                            if (isHoliday) className += " holiday";
-                            if (schoolHoliday) className += " school-holiday";
-
-                            return (
-                                <div
-                                    key={dateStr}
-                                    className={className}
-                                    title={`${day.toLocaleString(DateTime.DATE_HUGE)}${isHoliday ? ': ' + holidays.find(h => h.date === dateStr).name : ''}`}
-                                >
-                                    <span className="day-number">{day.day}</span>
-                                    <div className="away-bars">
-                                        {tracks.map((color, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="away-bar"
-                                                style={{
-                                                    backgroundColor: color || 'transparent',
-                                                    height: color ? '3px' : '3px',
-                                                    visibility: color ? 'visible' : 'hidden'
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
+                        return (
+                            <div
+                                key={dateStr}
+                                style={{
+                                    minHeight: '60px',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    backgroundColor: isHoliday ? '#fee2e2' : 'transparent',
+                                    borderBottom: schoolHoliday ? '3px solid #22c55e' : 'none',
+                                    transition: 'background 0.2s',
+                                    borderRadius: isHoliday ? '4px' : '0'
+                                }}
+                                title={`${day.toLocaleString(DateTime.DATE_HUGE)}${isHoliday ? ': ' + holidays.find(h => h.date === dateStr).name : ''}`}
+                            >
+                                <span style={{
+                                    fontSize: '1rem',
+                                    fontWeight: '700',
+                                    color: isWeekendDay ? '#ef4444' : '#111',
+                                    marginBottom: '4px'
+                                }}>
+                                    {day.day}
+                                </span>
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1px',
+                                    width: '100%',
+                                    marginTop: 'auto'
+                                }}>
+                                    {tracks.map((color, idx) => (
+                                        <div
+                                            key={idx}
+                                            style={{
+                                                width: '100%',
+                                                height: '3px',
+                                                backgroundColor: color || 'transparent',
+                                                visibility: color ? 'visible' : 'hidden',
+                                                borderRadius: '1px'
+                                            }}
+                                        />
+                                    ))}
                                 </div>
-                            );
-                        })}
-                    </div>
-                </Card.Body>
-            </Card>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         );
     };
 
     return (
-        <div className="yearly-overview animate-in">
-            <div className="d-flex justify-content-between align-items-center mb-4 no-print">
-                <h3 className="mb-0 gradient-text">📅 Jahresübersicht {year}</h3>
-                <div className="d-flex gap-3 align-items-center">
-                    <Button variant="outline-primary" size="sm" onClick={() => window.print()}>
+        <div className="yearly-overview animate-in" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
+            <div className="d-flex justify-content-between align-items-center mb-5 no-print">
+                <h3 className="mb-0 gradient-text" style={{ fontSize: '2.5rem' }}>📅 Jahresübersicht {year}</h3>
+                <div className="d-flex gap-2">
+                    <Button variant="outline-primary" onClick={() => window.print()}>
                         🖨️ Bericht drucken
                     </Button>
-                    <Button variant="secondary" size="sm" onClick={onClose}>
-                        Zurück
+                    <Button variant="secondary" onClick={onClose}>
+                        Schließen
                     </Button>
                 </div>
             </div>
 
-            <Row className="row-cols-1 row-cols-md-3 g-5 mb-5 px-3">
+            <Row className="row-cols-1 row-cols-md-3 g-5">
                 {months.map(m => (
-                    <Col key={m} className="px-4">
+                    <Col key={m} style={{ padding: '0 30px' }}>
                         {renderMonth(m)}
                     </Col>
                 ))}
             </Row>
 
-            <div className="legend mt-5 p-4 bg-white rounded shadow-sm no-print">
-                <h6 className="mb-3 fw-bold text-uppercase" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Team-Legende</h6>
-                <div className="d-flex flex-wrap gap-4">
+            <div className="legend mt-5 p-4 bg-white rounded shadow-sm no-print" style={{ maxWidth: '1200px', margin: '40px auto' }}>
+                <h6 className="mb-3 fw-bold text-uppercase" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Farblegende & Kürzel</h6>
+                <div className="d-flex flex-wrap gap-4 mb-3">
                     {team.map(member => (
                         <div key={member.id} className="d-flex align-items-center gap-2">
-                            <div className="away-dot" style={{ backgroundColor: member.color, width: 12, height: 12 }}></div>
-                            <span className="fw-semibold" style={{ fontSize: '0.85rem' }}>{member.name}</span>
+                            <div style={{ backgroundColor: member.color, width: 14, height: 14, borderRadius: '50%' }}></div>
+                            <span className="fw-semibold" style={{ fontSize: '0.9rem' }}>{member.name}</span>
                         </div>
                     ))}
                 </div>
                 <hr />
                 <div className="d-flex gap-4 mt-3">
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day holiday" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Feiertag</span>
+                        <div style={{ width: 18, height: 18, backgroundColor: '#fee2e2', borderRadius: '4px' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Feiertag</span>
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day school-holiday" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Schulferien</span>
+                        <div style={{ width: 18, borderBottom: '3px solid #22c55e' }}></div>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Schulferien</span>
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                        <div className="mini-day weekend" style={{ width: 18, height: 18, minHeight: 'auto' }}></div>
-                        <span className="text-muted" style={{ fontSize: '0.8rem' }}>Wochenende</span>
+                        <span style={{ fontSize: '0.85rem', color: '#ef4444', fontWeight: 'bold' }}>12</span>
+                        <span className="text-muted" style={{ fontSize: '0.85rem' }}>Wochenende</span>
                     </div>
                 </div>
             </div>
 
-            <style jsx>{`
-                .yearly-overview {
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    padding: 10px;
+            <style jsx global>{`
+                .animate-in {
+                    animation: fadeIn 0.4s ease-out;
                 }
-                .mini-calendar-grid {
-                    display: grid;
-                    grid-template-columns: repeat(7, 1fr);
-                    border: none;
-                }
-                .day-header {
-                    font-size: 0.85rem;
-                    font-weight: 800;
-                    text-align: center;
-                    padding: 4px 0;
-                    color: #111;
-                    margin-bottom: 2px;
-                }
-                .mini-day {
-                    background: transparent;
-                    min-height: 44px;
-                    padding: 2px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    position: relative;
-                }
-                .mini-day:hover:not(.empty) {
-                    background: #f8fafc;
-                    border-radius: 4px;
-                }
-                .mini-day.weekend .day-number {
-                    color: #ef4444;
-                }
-                .mini-day.holiday {
-                    background-color: #fee2e2;
-                    border-radius: 4px;
-                }
-                .mini-day.school-holiday {
-                    border-bottom: 2px solid #22c55e;
-                }
-                .day-number {
-                    font-size: 0.9rem;
-                    color: #222;
-                    font-weight: 700;
-                    margin-bottom: 4px;
-                }
-                .away-bars {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1px;
-                    width: 100%;
-                    padding: 0 1px;
-                }
-                .away-bar {
-                    width: 100%;
-                    border-radius: 1px;
-                }
-                .mini-month-card {
-                    border: none;
-                    background: transparent;
-                }
-                .month-title {
-                    background: transparent !important;
-                    color: #000 !important;
-                    font-size: 1.8rem !important;
-                    font-weight: 800 !important;
-                    border: none;
-                    text-align: center;
-                    padding-bottom: 8px;
-                    letter-spacing: -0.5px;
-                }
-                .legend {
-                    max-width: 1300px;
-                    margin-left: auto;
-                    margin-right: auto;
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 @media print {
                     .no-print { display: none !important; }
-                    .yearly-overview { background: white; padding: 0; max-width: 100%; }
-                    .mini-month-card { break-inside: avoid; margin-bottom: 30px; }
-                    .month-title { font-size: 2rem !important; }
+                    .yearly-overview { background: white !important; padding: 0 !important; max-width: 100% !important; }
+                    .mini-month-card { break-inside: avoid; margin-bottom: 50px !important; }
+                    body { background: white !important; }
                 }
             `}</style>
         </div>
