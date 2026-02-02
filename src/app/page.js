@@ -232,6 +232,7 @@ export default function Home() {
     title: v.vertreter ? `${v.name} (V: ${v.vertreter})` : v.name,
     start: v.start,
     end: v.end,
+    allDay: true,
     backgroundColor: getColorForMember(team, v.name),
     borderColor: getColorForMember(team, v.name),
     textColor: '#333'
@@ -502,6 +503,7 @@ export default function Home() {
                     right: 'dayGridMonth'
                   }}
                   events={allCalendarEvents}
+                  eventDisplay="block"
                   selectable={true}
                   editable={true}
                   eventResizableFromStart={true}
@@ -542,7 +544,19 @@ export default function Home() {
                         </div>
                       );
                     }
-                    return null; // Let FullCalendar handle normal events
+                    // For normal vacation events, we want the visible bar with title
+                    return (
+                      <div style={{
+                        padding: '2px 4px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '500',
+                        fontSize: '0.85rem'
+                      }}>
+                        {arg.event.title}
+                      </div>
+                    );
                   }}
                   eventDidMount={(info) => {
                     // Add tooltip for all events
@@ -827,6 +841,22 @@ export default function Home() {
                 
                 .fc-bg-event-content {
                     pointer-events: none !important;
+                }
+                
+                /* Custom styling for the vacation bars to make them look premium */
+                .fc-h-event {
+                    border: none !important;
+                    border-radius: 4px !important;
+                    margin-bottom: 1px !important;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    transition: all 0.2s ease;
+                }
+                
+                .fc-h-event:hover {
+                    filter: brightness(0.95);
+                    transform: translateY(-1px);
+                    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+                    z-index: 10 !important;
                 }
 
                 .fc-daygrid-day-number {
