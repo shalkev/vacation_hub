@@ -262,8 +262,12 @@ export default function Home() {
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <h1 className="mb-2">🏖️</h1>
-              <h3 className="gradient-text">efi Team Vacation Hub</h3>
-              <p className="text-muted">2026 Edition created by Volchca</p>
+              <h3 className="gradient-text mb-0">FI Team Vacation Hub</h3>
+              <div className="text-muted small">2026 Edition</div>
+              <div className="mt-2" style={{ fontSize: '0.9rem', color: '#666' }}>
+                created by Volha ❤️ <br />
+                <span style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>für bessere Planung</span>
+              </div>
             </div>
             <Form onSubmit={handleLogin}>
               <Form.Group className="mb-3">
@@ -329,7 +333,7 @@ export default function Home() {
             <div>
               <h2 className="mb-0 d-flex align-items-center">
                 <span className="me-2">🏖️</span>
-                <span className="gradient-text">Team Vacation Hub 2026</span>
+                <span className="gradient-text">FI Team Vacation Hub 2026</span>
               </h2>
             </div>
             <Button variant="outline-secondary" size="sm" onClick={() => setIsLoggedIn(false)}>
