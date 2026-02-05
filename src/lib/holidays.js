@@ -72,16 +72,30 @@ export function isHoliday(dateStr, holidays) {
 }
 
 // Calculate working days between two dates (excluding weekends and holidays)
-export function calculateWorkingDays(startStr, endStr, year) {
-    const holidays = getHolidaysBW(year);
+export function calculateWorkingDays(startStr, endStr) {
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+
+    // Get holidays for all involved years
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+    const years = [];
+    for (let y = startYear; y <= endYear; y++) {
+        years.push(y);
+    }
+
+    const holidays = getHolidaysForYears(years);
     const holidayDates = new Set(holidays.map(h => h.date));
 
     let workingDays = 0;
     const current = new Date(startStr);
-    const end = new Date(endStr);
 
     while (current <= end) {
-        const dateStr = current.toISOString().split('T')[0];
+        // Use local date parts to avoid UTC shift issues
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        const d = String(current.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${d}`;
 
         if (!isWeekend(dateStr) && !holidayDates.has(dateStr)) {
             workingDays++;
@@ -91,6 +105,37 @@ export function calculateWorkingDays(startStr, endStr, year) {
     }
 
     return workingDays;
+}
+
+// Get count of working days in a specific range
+export function getWorkingDaysInRange(periodStart, periodEnd) {
+    const start = new Date(periodStart);
+    const end = new Date(periodEnd);
+
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+    const years = [];
+    for (let y = startYear; y <= endYear; y++) {
+        years.push(y);
+    }
+
+    const holidays = getHolidaysForYears(years);
+    const holidayDates = new Set(holidays.map(h => h.date));
+
+    let count = 0;
+    const current = new Date(start);
+    while (current <= end) {
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        const d = String(current.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${d}`;
+
+        if (!isWeekend(dateStr) && !holidayDates.has(dateStr)) {
+            count++;
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    return count;
 }
 
 // Get all holidays for multiple years

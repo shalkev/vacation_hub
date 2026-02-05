@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react';
 import { Card, Badge, ListGroup, ProgressBar, Alert, Button, Table } from 'react-bootstrap';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
-import { calculateWorkingDays, getHolidaysBW } from '@/lib/holidays';
+import { calculateWorkingDays, getHolidaysBW, getWorkingDaysInRange } from '@/lib/holidays';
 
 const TOTAL_VACATION_DAYS = 30;
 
@@ -13,7 +13,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
 
     // Get current view period label
     const periodLabel = useMemo(() => {
-        if (!currentViewStart) return DateTime.now().toFormat('MMMM yyyy');
+        if (!currentViewStart) return DateTime.now().toFormat(' ' + 'MMMM yyyy');
         const start = DateTime.fromISO(currentViewStart);
         return start.toFormat('MMMM yyyy');
     }, [currentViewStart]);
@@ -36,9 +36,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
         vacations.forEach(v => {
             if (!teamNames.has(v.name)) return; // Skip orphaned data
 
-            const start = DateTime.fromISO(v.start);
-            const year = start.year;
-            const workingDays = calculateWorkingDays(v.start, v.end, year);
+            const workingDays = calculateWorkingDays(v.start, v.end);
 
             if (stats[v.name]) {
                 stats[v.name].daysBooked += workingDays;
@@ -58,7 +56,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
         }));
     }, [vacations, team]);
 
-    // Calculate absence rate for the CURRENTLY VIEWED period
+    // Calculate absence rate for the CURRENTLY VIEWED period using Man-Days (Arbeitstage)
     const absenceData = useMemo(() => {
         let periodStart, periodEnd;
         const teamNames = new Set(team.map(m => m.name));
@@ -72,26 +70,32 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
             periodEnd = now.endOf('month');
         }
 
-        const absentPeople = new Set();
+        const workingDaysInPeriod = getWorkingDaysInRange(periodStart.toISODate(), periodEnd.toISODate());
+        const totalTeamWorkingDays = workingDaysInPeriod * team.length;
+
+        let totalVacationWorkingDays = 0;
 
         vacations.forEach(v => {
             if (!teamNames.has(v.name)) return;
 
-            const start = DateTime.fromISO(v.start);
-            const end = DateTime.fromISO(v.end);
+            const vacStart = DateTime.fromISO(v.start);
+            const vacEnd = DateTime.fromISO(v.end);
 
-            if (start <= periodEnd && end >= periodStart) {
-                absentPeople.add(v.name);
+            // Calculate overlap between vacation and period
+            const overlapStart = vacStart > periodStart ? vacStart : periodStart;
+            const overlapEnd = vacEnd < periodEnd ? vacEnd : periodEnd;
+
+            if (overlapStart <= overlapEnd) {
+                const overlapWorkingDays = calculateWorkingDays(overlapStart.toISODate(), overlapEnd.toISODate());
+                totalVacationWorkingDays += overlapWorkingDays;
             }
         });
 
-        const totalTeam = Math.max(team.length, 1);
-        const absentCount = absentPeople.size;
-        const presentCount = Math.max(0, totalTeam - absentCount);
+        const presentDays = Math.max(0, totalTeamWorkingDays - totalVacationWorkingDays);
 
         return [
-            { name: 'Anwesend', value: presentCount, color: '#4ECDC4' },
-            { name: 'Im Urlaub', value: absentCount, color: '#FF6B6B' }
+            { name: 'Anwesenheit (Tag)', value: presentDays, color: '#4ECDC4' },
+            { name: 'Urlaub (Tag)', value: totalVacationWorkingDays, color: '#FF6B6B' }
         ];
     }, [vacations, team, currentViewStart, currentViewEnd]);
 
@@ -363,8 +367,8 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
                     </ResponsiveContainer>
                     <div className="text-center mt-1">
                         <small className="text-muted">
-                            <span style={{ color: '#4ECDC4' }}>●</span> Anwesend: {absenceData[0]?.value || 0} |
-                            <span style={{ color: '#FF6B6B' }}> ●</span> Urlaub: {absenceData[1]?.value || 0}
+                            <span style={{ color: '#4ECDC4' }}>●</span> Anwesenheit: {absenceData[0]?.value || 0} Tage |
+                            <span style={{ color: '#FF6B6B' }}> ●</span> Urlaub: {absenceData[1]?.value || 0} Tage
                         </small>
                     </div>
                 </Card.Body>
