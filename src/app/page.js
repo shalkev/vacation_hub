@@ -98,11 +98,25 @@ export default function Home() {
     }
   };
 
+  // Helper for inclusive/exclusive date conversion
+  const adjustEndDate = (dateStr, days) => {
+    if (!dateStr) return dateStr;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + days);
+    const yr = date.getFullYear();
+    const mo = String(date.getMonth() + 1).padStart(2, '0');
+    const da = String(date.getDate()).padStart(2, '0');
+    return `${yr}-${mo}-${da}`;
+  };
+
   // Handle calendar date selection
   const handleDateSelect = (info) => {
+    // FullCalendar's endStr is exclusive (day after), we make it inclusive
+    const inclusiveEnd = adjustEndDate(info.endStr, -1);
     setSelectedRange({
       start: info.startStr,
-      end: info.endStr
+      end: inclusiveEnd
     });
     setSelectedMember(team.length > 0 ? team[0].name : '');
     setVertreter('');
@@ -174,10 +188,14 @@ export default function Home() {
 
   // Handle drag and drop / resize
   const handleEventChange = async (info) => {
+    const inclusiveEnd = info.event.endStr
+      ? adjustEndDate(info.event.endStr, -1)
+      : info.event.startStr;
+
     const result = await updateVacation(
       info.event.id,
       info.event.startStr,
-      info.event.endStr || info.event.startStr
+      inclusiveEnd
     );
 
     if (!result.success) {
@@ -233,7 +251,7 @@ export default function Home() {
     id: v.id,
     title: v.vertreter ? `${v.name} (V: ${v.vertreter})` : v.name,
     start: v.start,
-    end: v.end,
+    end: adjustEndDate(v.end, 1), // Convert to exclusive for FullCalendar display
     allDay: true,
     backgroundColor: getColorForMember(team, v.name),
     borderColor: getColorForMember(team, v.name),

@@ -80,7 +80,7 @@ export function calculateWorkingDays(startStr, endStr, year) {
     const current = new Date(startStr);
     const end = new Date(endStr);
 
-    while (current < end) {
+    while (current <= end) {
         const dateStr = current.toISOString().split('T')[0];
 
         if (!isWeekend(dateStr) && !holidayDates.has(dateStr)) {

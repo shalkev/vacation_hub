@@ -79,13 +79,13 @@ export default function YearlyOverview({ vacations, team, year, onClose }) {
                         const schoolHoliday = schoolHolidays.find(sh => {
                             const start = DateTime.fromISO(sh.start);
                             const end = DateTime.fromISO(sh.end);
-                            return day >= start && day < end;
+                            return day >= start && day <= end;
                         });
 
                         // Each member gets a dedicated track for vacation strips
                         const tracks = team.map(member => {
                             const vList = memberVacations[member.name] || [];
-                            const isAway = vList.some(v => day >= v.start && day < v.end);
+                            const isAway = vList.some(v => day >= v.start && day <= v.end);
                             return isAway ? member.color : null;
                         });
 

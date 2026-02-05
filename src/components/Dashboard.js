@@ -111,7 +111,7 @@ export default function Dashboard({ vacations, team, currentViewStart, currentVi
                 const bStart = new Date(b.start);
                 const bEnd = new Date(b.end);
 
-                if (aStart < bEnd && aEnd > bStart) {
+                if (aStart <= bEnd && aEnd >= bStart) {
                     const overlapStart = new Date(Math.max(aStart, bStart));
                     const overlapEnd = new Date(Math.min(aEnd, bEnd));
 
